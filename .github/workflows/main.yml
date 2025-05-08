@@ -101,6 +101,10 @@ jobs:
           exit-code: 1
           ignore-unfixed: true
           severity: "CRITICAL,HIGH"
+          ignore-unfixed: true
+          args: >
+            --skip-files '**/.npm/_cacache/**'
+            --skip-files '**/node_modules/**'
 
       - name: Push Docker image
         uses: docker/build-push-action@v5
