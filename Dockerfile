@@ -1,13 +1,27 @@
-FROM node:22-alpine
+# Use Node.js as base image
+FROM node:20-alpine
 
+# Create app directory
 WORKDIR /app
 
-COPY package.json package-lock.json ./
+# Copy package files
+COPY package*.json ./
 
-RUN npm ci
+# Install dependencies
+# Use npm ci for cleaner, more reliable builds
+RUN npm ci && \
+    # Fix vulnerabilities where possible
+    npm audit fix || true && \
+    # Update nth-check to fix CVE-2021-3803
+    npm install nth-check@2.0.1 --save && \
+    # Clean npm cache to remove any private keys
+    npm cache clean --force
 
+# Copy source code
 COPY . .
 
+# Expose port for development server
 EXPOSE 3000
 
-CMD ["npm", "run", "dev"]
+# Start development server
+CMD ["npm", "start"]
