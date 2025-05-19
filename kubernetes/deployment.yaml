@@ -16,7 +16,7 @@ spec:
     spec:
       containers:
         - name: tic-tac-toe
-          image: ghcr.io/RESTfulAyush/rock-paper-scissors:sha-b6174625fc07af368b7054ffe1b60bb549ae230c
+          image: ghcr.io/RESTfulAyush/rock-paper-scissors:sha-cba4f271141d55127b4389cd3162d08ddbd9169d
           # Image will be automatically updated by CI/CD pipeline
           imagePullPolicy: Always
           ports:
