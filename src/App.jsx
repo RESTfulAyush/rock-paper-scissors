@@ -3,7 +3,7 @@ import React, { useState } from 'react';
 function App() {
   // Game logic utilities
   const getComputerChoice = () => {
-    const choices = ['rock', 'paper', 'scissors'];
+    const choices = ['stone', 'paper', 'scissors'];
     const randomIndex = Math.floor(Math.random() * 3);
     return choices[randomIndex];
   };
@@ -12,8 +12,8 @@ function App() {
     if (player === computer) return 'draw';
     
     if (
-      (player === 'rock' && computer === 'scissors') ||
-      (player === 'paper' && computer === 'rock') ||
+      (player === 'stone' && computer === 'scissors') ||
+      (player === 'paper' && computer === 'stone') ||
       (player === 'scissors' && computer === 'paper')
     ) {
       return 'player';
@@ -23,9 +23,9 @@ function App() {
   };
 
   // Constants
-  const CHOICES = ['rock', 'paper', 'scissors'];
+  const CHOICES = ['stone', 'paper', 'scissors'];
   const CHOICE_ICONS = {
-    rock: '✊',
+    stone: '✊',
     paper: '✋',
     scissors: '✌️'
   };
@@ -187,7 +187,7 @@ function App() {
   return (
     <div className="flex flex-col items-center justify-center min-h-screen bg-gradient-to-br from-blue-100 to-purple-100 p-4">
       <div className="bg-white rounded-xl shadow-lg p-6 w-full max-w-md">
-        <h1 className="text-3xl font-bold text-center text-gray-800 mb-6">Rock Paper Scissors</h1>
+        <h1 className="text-3xl font-bold text-center text-gray-800 mb-6">stone Paper Scissors</h1>
         
         <ScoreBoard score={score} />
         
