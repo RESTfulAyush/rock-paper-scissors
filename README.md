@@ -1,70 +1,100 @@
-# Getting Started with Create React App
+# ⚙️ CI/CD Pipeline for Rock-Paper-Scissors App
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+This project demonstrates a complete CI/CD workflow for containerizing and deploying a frontend application using **GitHub Actions**, **Docker**, **Trivy**, and **Kubernetes**.
 
-## Available Scripts
+## 🧩 Pipeline Overview
 
-In the project directory, you can run:
+The CI/CD pipeline is triggered on every push to the `main` branch, excluding changes made solely to the `kubernetes/deployment.yaml` file to avoid infinite loops. It consists of the following stages:
 
-### `npm start`
+### 🔹 1. **Unit Testing**
+- Installs dependencies via `npm ci`
+- Runs unit tests to ensure code quality
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+### 🔹 2. **Build**
+- Builds the production-ready application
+- Uploads the build artifacts for use in the next stage
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
+### 🔹 3. **Docker Build, Scan & Push**
+- Builds a Docker image using the Git commit SHA as the tag (`sha-<short_sha>`)
+- Scans the image using [Trivy](https://github.com/aquasecurity/trivy) for critical and high-severity vulnerabilities
+- Pushes the image to **GitHub Container Registry (GHCR)**
 
-### `npm test`
+### 🔹 4. **Update Kubernetes Deployment**
+- Automatically updates the `kubernetes/deployment.yaml` file with the new image tag
+- Commits and pushes the updated file back to the repository
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+> ✅ The pipeline ensures every new deployment uses a clean, tested, and secure Docker image.
 
-### `npm run build`
+---
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+## 🔐 Security Scanning with Trivy
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+The image is scanned with Trivy before being pushed to the registry. The scan configuration includes:
+- Vulnerability severity: `CRITICAL`, `HIGH`
+- Scan types: `os`, `library`
+- Custom ignore paths for build cache and `node_modules`
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+---
 
-### `npm run eject`
+## 🚢 Docker & Kubernetes
 
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
+- Docker images are built using **Buildx** for compatibility and performance.
+- Images are stored in **GitHub Container Registry (ghcr.io)**
+- Kubernetes deployment is updated via `sed` to reflect the latest image:
+```
 
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+image: ghcr.io/RESTfulAyush/rock-paper-scissors\:sha-\<commit\_sha>
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
+```
 
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
+- `imagePullSecrets` is used for GHCR authentication inside Kubernetes.
 
-## Learn More
+---
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+## 📁 Project Structure
 
-To learn React, check out the [React documentation](https://reactjs.org/).
+```
 
-### Code Splitting
+.
+├── .github/workflows
+│   └── main.yml            # GitHub Actions pipeline definition
+├── kubernetes
+│   └── deployment.yaml      # Kubernetes Deployment file (auto-updated)
+├── Dockerfile               # Container build file
+└── ...                      # Other project files
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
+```
 
-### Analyzing the Bundle Size
+---
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
+## 📦 Image Tagging Strategy
 
-### Making a Progressive Web App
+- The Docker image is tagged as: `ghcr.io/RESTfulAyush/rock-paper-scissors:sha-<short_commit_sha>`
+- This ensures traceability between image versions and code commits
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
+---
 
-### Advanced Configuration
+## 🚀 Technologies Used
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
+- **GitHub Actions** – CI/CD automation
+- **Docker & Buildx** – Containerization
+- **Trivy** – Security scanning
+- **Kubernetes** – Application deployment
+- **GitHub Container Registry (GHCR)** – Image hosting
 
-### Deployment
+---
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
+## 📌 Requirements for Production
 
-### `npm run build` fails to minify
+- A Kubernetes cluster with access to GHCR
+- ImagePullSecrets configured to pull from private GitHub registry
+- Proper RBAC and deployment permissions for CI/CD bot (if deploying directly)
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+---
+
+## 💡 Future Enhancements
+
+- Integrate deployment to Kubernetes cluster via `kubectl apply`
+- Add Slack/Discord notifications for build/deploy status
+- Add GitHub Environment protection rules for staging/production
+
