@@ -1,21 +1,21 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: tic-tac-toe
+  name: rock-paper-scissors
   labels:
-    app: tic-tac-toe
+    app: rock-paper-scissors
 spec:
   replicas: 3
   selector:
     matchLabels:
-      app: tic-tac-toe
+      app: rock-paper-scissors
   template:
     metadata:
       labels:
-        app: tic-tac-toe
+        app: rock-paper-scissors
     spec:
       containers:
-        - name: tic-tac-toe
+        - name: rock-paper-scissors
           image: ghcr.io/restfulayush/rock-paper-scissors:sha-62eeee6570aee8251faa8f5bb6e1f35cb926172b
           # Image will be automatically updated by CI/CD pipeline
           imagePullPolicy: Always
